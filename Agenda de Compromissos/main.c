@@ -5,10 +5,13 @@
 
 #define MAX_TAREFAS 50
 
+typedef int TIPOCHAVE;
+typedef char dataRef[11];
+
 typedef struct {
-    int chave;
-    char dataCompromisso[50];
-    char descricaoCompromisso[50];
+    TIPOCHAVE chave;
+    dataRef dataCompromisso[20];
+    char descricaoCompromisso[300];
 } Agenda;
 
 bool validarData(const char *data) {
@@ -56,7 +59,7 @@ void criarTimestamp(char *timestamp) {
 void obterDescricaoCompromisso(char *compromisso) {
     printf("Digite a descrição do seu novo compromisso: ");
     fflush(stdin);
-    fgets(compromisso, 50, stdin);
+    fgets(compromisso, 300, stdin);
     compromisso[strcspn(compromisso, "\n")] = '\0';
     if (strlen(compromisso) == 0) {
         printf("Descrição vazia. Digite novamente.\n");
@@ -149,6 +152,13 @@ void limparAgenda(Agenda *lista, int *tamanho) {
     printf("Todos os compromissos foram apagados.\n");
 }
 
+void limparTela() {
+    printf("Pressione qualquer tecla para continuar.");
+    fflush(stdin);
+    getchar();
+    system("cls");
+}
+
 int main() {
     Agenda lista[MAX_TAREFAS];
     int chave = 1; // Inicialize a chave sequencial com 1
@@ -182,8 +192,7 @@ int main() {
                 } else {
                     exibirElementos(lista, tamanho);
                 }
-                printf("Pressione qualquer tecla para continuar.\n");
-                getchar();
+                limparTela();
                 break;
             case 2:
                 if (tamanho == 0) {
@@ -194,16 +203,19 @@ int main() {
                     printf("Elemento %d: \n", indice);
                     consultarElemento(lista, indice);
                 }
+                limparTela();
                 break;
             case 3:
                 obterDescricaoCompromisso(novaDescricao);
                 criarTimestamp(novaData);
                 adicionarTarefa(lista, &tamanho, &chave, novaData, novaDescricao);
                 qsort(lista, tamanho, sizeof(Agenda), comparar_agenda);
+                limparTela();
                 break;
             case 4:
                 comprimento_agenda = comprimentoAgenda(lista, tamanho);
                 printf("Você tem %d compromissos em sua agenda.\n", comprimento_agenda);
+                limparTela();
                 break;
             case 5:
                 exibirElementos(lista, tamanho);
@@ -227,6 +239,7 @@ int main() {
                         printf("Compromisso Removido.\n");
                         break;
                 }
+                limparTela();
                 break;
             case 6:
                 if (tamanho == 0) {
@@ -234,6 +247,7 @@ int main() {
                 } else {
                     limparAgenda(lista, &tamanho);
                 }
+                limparTela();
                 break;
             case 0:
                 printf("Encerrando o programa.\n");
@@ -241,6 +255,7 @@ int main() {
                 break;
             default:
                 printf("Opção inválida. Tente novamente.\n");
+                limparTela();
         }
     }
 
