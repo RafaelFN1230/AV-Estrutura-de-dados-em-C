@@ -1,11 +1,10 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
 #define MAX_ALUNOS 100
+#define MAX_OCORRENCIAS 100
 
-//Variaveis Globais
-Aluno listaAlunos[MAX_ALUNOS];
-int tamanhoLista = 0;
 
 typedef int TIPOCHAVE;
 typedef char dataRef[11];
@@ -22,6 +21,12 @@ typedef struct {
     char nome[50];
     char periodo[20];
 } Aluno;
+
+typedef struct {
+    char matricula[20];
+    char tipoOcorrencia[10];
+} Ocorrencia;
+
 
 bool validarData(const char *data) {
     int anos, meses, dias;
@@ -59,16 +64,16 @@ void registrarOcorrencia(const char *matricula, const char *tipoOcorrencia) {
     acesso.chave = 1; // Defina a chave como desejado
     strcpy(acesso.matricula, matricula);
     strcpy(acesso.tipoOcorrencia, tipoOcorrencia);
-    printf("Ocorrência registrada para a matrícula: %s - Tipo: %s\n", acesso.matricula, acesso.tipoOcorrencia);
+    printf("Ocorrï¿½ncia registrada para a matrï¿½cula: %s - Tipo: %s\n", acesso.matricula, acesso.tipoOcorrencia);
 }
 
 void obterTipoOcorrencia(char *tipoOcorrencia) {
-    printf("Selecione o tipo de ocorrência:\n");
+    printf("Selecione o tipo de ocorrï¿½ncia:\n");
     printf("1. Esqueceu\n");
     printf("2. Perdeu\n");
-    printf("3. Não Possui\n");
+    printf("3. Nï¿½o Possui\n");
     printf("4. Outros\n");
-    printf("Escolha uma opção: ");
+    printf("Escolha uma opï¿½ï¿½o: ");
     int tipoEscolhido;
     scanf("%d", &tipoEscolhido);
 
@@ -80,49 +85,56 @@ void obterTipoOcorrencia(char *tipoOcorrencia) {
             strcpy(tipoOcorrencia, "Perdeu");
             break;
         case 3:
-            strcpy(tipoOcorrencia, "Não Possui");
+            strcpy(tipoOcorrencia, "Nï¿½o Possui");
             break;
         case 4:
             strcpy(tipoOcorrencia, "Outros");
             break;
         default:
-            printf("Opção inválida. A ocorrência será registrada como 'Outros'.\n");
+            printf("Opï¿½ï¿½o invï¿½lida. A ocorrï¿½ncia serï¿½ registrada como 'Outros'.\n");
             strcpy(tipoOcorrencia, "Outros");
             break;
     }
 }
 
+//Variaveis Globais
+Aluno listaAlunos[MAX_ALUNOS];
+Ocorrencia listaOcorrencias[MAX_ALUNOS];
+int tamanhoLista = 0;
+int tamanhoOcorrencias = 0;
 
 void chamadaGeral(const char *matricula) {
     for (int i = 0; i < tamanhoLista; i++) {
         if (strcmp(listaAlunos[i].matricula, matricula) == 0) {
             char tipoOcorrencia[10];
-            printf("Matrícula: %s, Nome: %s, Período: %s\n", listaAlunos[i].matricula, listaAlunos[i].nome, listaAlunos[i].periodo);
-            printf("Gostaria de adicionar uma ocorrência para este aluno? (1 para Sim, 0 para Não): ");
+            printf("Matrï¿½cula: %s, Nome: %s, Perï¿½odo: %s\n", listaAlunos[i].matricula, listaAlunos[i].nome, listaAlunos[i].periodo);
+            printf("Gostaria de adicionar uma ocorrï¿½ncia para este aluno? (1 para Sim, 0 para Nï¿½o): ");
             int escolha;
             scanf("%d", &escolha);
             if (escolha == 1) {
                 obterTipoOcorrencia(tipoOcorrencia);
                 registrarOcorrencia(matricula, tipoOcorrencia);
-                printf("Ocorrência registrada com sucesso.\n");
+                printf("Ocorrï¿½ncia registrada com sucesso.\n");
             }
             return;
         }
     }
-    printf("Aluno com matrícula %s não encontrado.\n", matricula);
+    printf("Aluno com matrï¿½cula %s nï¿½o encontrado.\n", matricula);
 }
 
 
-bool validarPeriodo(const char *periodo) {
-    if (periodo == M ||periodo == V ||periodo == N)
+bool validarPeriodo(char *periodo) {
+    printf("%s", periodo);
+    if (strcmp(periodo, "M") == 0 || strcmp(periodo, "V") == 0 || strcmp(periodo, "N") == 0)
     {
+        printf("Entrou");
         return true;
     }
     return false;
 }
 
 void obterInformacaoAluno(char *matricula, char *nome, char *periodo) {
-    printf("Digite a matrícula do novo aluno: ");
+    printf("Digite a matrï¿½cula do novo aluno: ");
     scanf("%s", matricula);
     printf("Digite o nome do novo aluno: ");
     scanf("%s", nome);
@@ -145,7 +157,7 @@ void cadastrarAluno(const char *matricula, const char *nome, const char *periodo
         tamanhoLista++;
         printf("Aluno cadastrado com sucesso!\n");
     } else {
-        printf("A lista de alunos está cheia. Não é possível cadastrar mais alunos.\n");
+        printf("A lista de alunos estï¿½ cheia. Nï¿½o ï¿½ possï¿½vel cadastrar mais alunos.\n");
     }
 }
 
@@ -160,10 +172,10 @@ bool buscarAlunoPorMatricula(const char *matricula, Aluno *alunoEncontrado) {
 }
 
 void editarOuRemoverAluno(Aluno *aluno) {
-    printf("O que você deseja fazer?\n");
+    printf("O que vocï¿½ deseja fazer?\n");
     printf("1. Editar nome\n");
     printf("2. Remover aluno\n");
-    printf("Escolha uma opção: ");
+    printf("Escolha uma opï¿½ï¿½o: ");
     int opcao;
     scanf("%d", &opcao);
 
@@ -174,16 +186,23 @@ void editarOuRemoverAluno(Aluno *aluno) {
             printf("Nome do aluno atualizado com sucesso.\n");
             break;
         case 2:
-            // Implemente a remoção do aluno aqui
+            // Implemente a remoï¿½ï¿½o do aluno aqui
             printf("Aluno removido com sucesso.\n");
             break;
         default:
-            printf("Opção inválida.\n");
+            printf("Opï¿½ï¿½o invï¿½lida.\n");
             break;
     }
 }
 
-
+void mostrarOcorrenciasPorMatricula(const char *matricula) {
+    printf("Ocorrï¿½ncias do aluno com matrï¿½cula %s:\n", matricula);
+    for (int i = 0; i < tamanhoOcorrencias; i++) {
+        if (strcmp(listaOcorrencias[i].matricula, matricula) == 0) {
+            printf("Tipo de ocorrï¿½ncia: %s\n", listaOcorrencias[i].tipoOcorrencia);
+        }
+    }
+}
 
 int main() {
     int escolha;
@@ -192,101 +211,116 @@ int main() {
     char nome[50];
     char tipoOcorrencia[10];
     char data[20];
+    char periodo[20];
+
+    Aluno alunoEncontrado;
 
     while (app == 1) {
         printf("\nMenu:\n");
         printf("1. Chamada\n");
         printf("2. Buscar Aluno\n");
         printf("3. Cadastrar Novo Aluno\n");
-        printf("4. Inserir Ocorrência\n");
-        printf("5. Mostrar Número de Alunos Cadastrados\n");
+        printf("4. Inserir Ocorrï¿½ncia\n");
+        printf("5. Mostrar Nï¿½mero de Alunos Cadastrados\n");
         printf("6. Editar/Remover Aluno\n");
-        printf("7. Mostrar Ocorrências\n");
-        printf("8. Reiniciar Ocorrências\n");
+        printf("7. Mostrar Ocorrï¿½ncias\n");
+        printf("8. Reiniciar Ocorrï¿½ncias\n");
         printf("9. Reiniciar Programa\n");
         printf("0. Sair\n");
-        printf("Escolha uma opção: ");
+        printf("Escolha uma opï¿½ï¿½o: ");
         scanf("%d", &escolha);
 
         switch (escolha) {
             case 1:
                 if (tamanhoLista == 0) {
-                    printf("Você não possui alunos cadastrados.\n");
+                    printf("Vocï¿½ nï¿½o possui alunos cadastrados.\n");
                 } else {
-                    obterData(data)
-                    chamadaGeral(matricula)
+                    obterData(data);
+                    chamadaGeral(matricula);
                 }
                 break;
             case 2:
                 if (tamanhoLista == 0) {
-                    printf("Você não possui alunos cadastrados.\n");
+                    printf("Vocï¿½ nï¿½o possui alunos cadastrados.\n");
                 } else {
-                    printf("Digite a matrícula do aluno a ser buscado: ");
+                    printf("Digite a matrï¿½cula do aluno a ser buscado: ");
                     scanf("%s", matricula);
                     Aluno alunoEncontrado;
 
                     if (buscarAlunoPorMatricula(matricula, &alunoEncontrado)) {
-                        printf("Aluno encontrado: Matrícula: %s, Nome: %s, Período: %s\n", alunoEncontrado.matricula, alunoEncontrado.nome, alunoEncontrado.periodo);
+                        printf("Aluno encontrado: Matrï¿½cula: %s, Nome: %s, Perï¿½odo: %s\n", alunoEncontrado.matricula, alunoEncontrado.nome, alunoEncontrado.periodo);
                     } else {
-                        printf("Aluno com matrícula %s não encontrado.\n", matricula);
+                        printf("Aluno com matrï¿½cula %s nï¿½o encontrado.\n", matricula);
                     }
                 }
                 break;
             case 3:
                 if (tamanhoLista < MAX_ALUNOS) {
-                    obterInformacaoAluno(matricula, nome, periodo)
+                    obterInformacaoAluno(matricula, nome, periodo);
                     cadastrarAluno(matricula, nome, periodo);
                 } else {
-                    printf("A lista de alunos está cheia. Não é possível cadastrar mais alunos.\n");
+                    printf("A lista de alunos estï¿½ cheia. Nï¿½o ï¿½ possï¿½vel cadastrar mais alunos.\n");
                 }
                 break;
             case 4:
                 if (tamanhoLista == 0) {
-                    printf("Você não possui alunos cadastrados.\n");
+                    printf("Vocï¿½ nï¿½o possui alunos cadastrados.\n");
                 } else {
-                    printf("Digite a matrícula do aluno: ");
+                    printf("Digite a matrï¿½cula do aluno: ");
                     scanf("%s", matricula);
-                    printf("Digite o tipo de ocorrência: ");
+                    printf("Digite o tipo de ocorrï¿½ncia: ");
                     scanf("%s", tipoOcorrencia);
                     registrarOcorrencia(matricula, tipoOcorrencia);
                 }
                 break;
             case 5:
-                printf("Número de alunos cadastrados: %d\n", contarAlunos(listaAlunos, tamanhoLista)));
+                printf("Nï¿½mero de alunos cadastrados: %d\n", contarAlunos(listaAlunos, tamanhoLista));
                 break;
             case 6:
                 if (tamanhoLista == 0) {
-                    printf("Você não possui alunos cadastrados.\n");
+                    printf("Vocï¿½ nï¿½o possui alunos cadastrados.\n");
                 }  else {
                     char matricula[20];
-                    printf("Digite a matrícula do aluno a ser editado: ");
+                    printf("Digite a matrï¿½cula do aluno a ser editado: ");
                     scanf("%s", matricula);
                     Aluno alunoEncontrado;
 
                     if (buscarAlunoPorMatricula(matricula, &alunoEncontrado)) {
-                        printf("Aluno encontrado: Matrícula: %s, Nome: %s, Período: %s\n", alunoEncontrado.matricula, alunoEncontrado.nome, alunoEncontrado.periodo);
+                        printf("Aluno encontrado: Matrï¿½cula: %s, Nome: %s, Perï¿½odo: %s\n", alunoEncontrado.matricula, alunoEncontrado.nome, alunoEncontrado.periodo);
                         editarOuRemoverAluno(&alunoEncontrado);
                     } else {
-                        printf("Aluno com matrícula %s não encontrado.\n", matricula);
+                        printf("Aluno com matrï¿½cula %s nï¿½o encontrado.\n", matricula);
                     }
                 }
 
                 break;
             case 7:
-                printf("Número de alunos cadastrados: %d\n", contarAlunos(listaAlunos, tamanhoLista)));
+                if (tamanhoLista == 0) {
+                    printf("Vocï¿½ nï¿½o possui alunos cadastrados.\n");
+                } else {
+                    char matricula[20];
+                    printf("Digite a matrï¿½cula do aluno para mostrar as ocorrï¿½ncias: ");
+                    scanf("%s", matricula);
+
+                    if (buscarAlunoPorMatricula(matricula, &alunoEncontrado)) {
+                        mostrarOcorrenciasPorMatricula(matricula);
+                    } else {
+                        printf("Aluno com matrï¿½cula %s nï¿½o encontrado.\n", matricula);
+                    }
+                }
                 break;
             case 8:
-                printf("Número de alunos cadastrados: %d\n", contarAlunos(listaAlunos, tamanhoLista)));
+                printf("Nï¿½mero de alunos cadastrados: %d\n", contarAlunos(listaAlunos, tamanhoLista));
                 break;
             case 9:
-                printf("Número de alunos cadastrados: %d\n", contarAlunos(listaAlunos, tamanhoLista)));
+                printf("Nï¿½mero de alunos cadastrados: %d\n", contarAlunos(listaAlunos, tamanhoLista));
                 break;
             case 0:
                 printf("Encerrando o programa.\n");
                 app = 0;
                 break;
             default:
-                printf("Opção inválida. Tente novamente.\n");
+                printf("Opï¿½ï¿½o invï¿½lida. Tente novamente.\n");
         }
     }
 
