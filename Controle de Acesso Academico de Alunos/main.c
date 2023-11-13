@@ -27,7 +27,6 @@ typedef struct {
 typedef struct {
     char matricula[20];
     char tipoOcorrencia[10];
-    char dataHoraChamada[20];
 } Ocorrencia;
 
 // Variáveis Globais
@@ -88,8 +87,9 @@ void adicionarNaChamada(const Aluno *aluno) {
     }
 }
 
-void mostrarChamada() {
-    printf("Chamada:\n");
+void mostrarChamada(const char *data) {
+    printf("Chamada para a data: %s\n", data);
+
     int i = inicioChamada;
     while (i != fimChamada) {
         printf("Matrícula: %s, Nome: %s, Período: %s\n", filaChamada[i].matricula, filaChamada[i].nome, filaChamada[i].periodo);
@@ -97,18 +97,10 @@ void mostrarChamada() {
     }
 }
 
-void registrarOcorrencia(const char *matricula, const char *tipoOcorrencia, const char *dataHoraChamada) {
+void registrarOcorrencia(const char *matricula, const char *tipoOcorrencia, const char *data) {
     if (tamanhoOcorrencias < MAX_OCORRENCIAS) {
         strcpy(listaOcorrencias[tamanhoOcorrencias].matricula, matricula);
         strcpy(listaOcorrencias[tamanhoOcorrencias].tipoOcorrencia, tipoOcorrencia);
-        strcpy(listaOcorrencias[tamanhoOcorrencias].dataHoraChamada, dataHoraChamada);  // Salva a data e hora da chamada
-
-        // Obtenha a data e hora atual
-        time_t tempoAtual;
-        struct tm *tempoInfo;
-        time(&tempoAtual);
-        tempoInfo = localtime(&tempoAtual);
-        strftime(listaOcorrencias[tamanhoOcorrencias].dataHoraChamada, sizeof(listaOcorrencias[tamanhoOcorrencias].dataHoraChamada), "%Y-%m-%d %H:%M:%S", tempoInfo);
 
         tamanhoOcorrencias++;
         printf("Ocorrência registrada com sucesso para a matrícula %s.\n", matricula);
@@ -171,7 +163,6 @@ void reiniciarPrograma() {
     for (int i = 0; i < MAX_OCORRENCIAS; i++) {
         listaOcorrencias[i].matricula[0] = '\0';
         listaOcorrencias[i].tipoOcorrencia[0] = '\0';
-        listaOcorrencias[i].dataHoraChamada[0] = '\0';
     }
 
     for (int i = 0; i < MAX_CHAMADA; i++) {
@@ -195,7 +186,9 @@ void obterInformacaoAluno(char *matricula, char *nome, char *periodo) {
     printf("Digite a matrícula do novo aluno: ");
     scanf("%s", matricula);
     printf("Digite o nome do novo aluno: ");
-    scanf("%s", nome);
+    getchar();  // Limpar o buffer de entrada antes de usar fgets
+    fgets(nome, sizeof(listaAlunos[0].nome), stdin);
+    nome[strcspn(nome, "\n")] = '\0';
     do {
         printf("Digite o periodo do novo aluno: \n");
         printf("Digite M para matutino\n");
@@ -314,7 +307,7 @@ void mostrarOcorrenciasPorMatricula(const char *matricula) {
     printf("Ocorrências do aluno com matrícula %s:\n", matricula);
     for (int i = 0; i < tamanhoOcorrencias; i++) {
         if (strcmp(listaOcorrencias[i].matricula, matricula) == 0) {
-            printf("Tipo de ocorrência: %s, Data e Hora: %s\n", listaOcorrencias[i].tipoOcorrencia, listaOcorrencias[i].dataHoraChamada);
+            printf("Tipo de ocorrência: %s, Data: %s\n", listaOcorrencias[i].tipoOcorrencia);
         }
     }
 }
@@ -326,19 +319,20 @@ void adicionarOcorrencia(const char *matricula, const char *tipoOcorrencia, cons
         Aluno alunoEncontrado;
         if (buscarAlunoPorMatricula(matricula, &alunoEncontrado)) {
             adicionarNaChamada(&alunoEncontrado);
+            // Adiciona na lista de ocorrências
+            registrarOcorrencia(matricula, tipoOcorrencia, data);
         } else {
             printf("Aluno com matrícula %s não encontrado.\n", matricula);
         }
 
-        // Adiciona na lista de ocorrências
-        registrarOcorrencia(matricula, tipoOcorrencia, data);
+
     } else {
         printf("A lista de ocorrências está cheia. Não é possível adicionar mais ocorrências.\n");
     }
 }
 
 
-void chamadaGeral(data) {
+void chamadaGeral(const char *data) {
     if (tamanhoLista == 0) {
         printf("Você não possui alunos cadastrados.\n");
         return;
@@ -390,7 +384,7 @@ int main() {
                     printf("Você não possui alunos cadastrados.\n");
                 } else {
                     obterData(data);
-                    chamadaGeral(matricula, data);
+                    chamadaGeral(matricula);
                     mostrarChamada(data);
                 }
                 break;
