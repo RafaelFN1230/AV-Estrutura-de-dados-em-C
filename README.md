@@ -1,6 +1,6 @@
 # AV-Estrutura-de-dados-em-C
 
-##Codigos desenvolvidos para rodar na IDE Code::Blocks
+## Codigos desenvolvidos para rodar na IDE Code::Blocks
 
-##Integrantes
+## Integrantes
 Rafael Figliuolo Nascimento
